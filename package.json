@@ -1,0 +1,31 @@
+{
+  "name": "directZ",
+  "version": "0.0.1",
+  "description": "Multibrowser replacement for directUC",
+  "main": "js/main.js",
+  "dependencies": {
+    "gulp": "^3.8.11"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/camolin3/directZ"
+  },
+  "keywords": [
+    "PUC",
+    "UC",
+    "login",
+    "search"
+  ],
+  "author": "camolin3",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/camolin3/directZ/issues"
+  },
+  "homepage": "https://github.com/camolin3/directZ"
+}
