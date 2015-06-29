@@ -1,20 +1,26 @@
 {
-  "name": "directZ",
+  "name": "direct-uc-next",
   "version": "0.0.1",
   "description": "Multibrowser replacement for directUC",
-  "main": "js/main.js",
-  "dependencies": {
-    "gulp": "^3.8.11"
-  },
+  "main": "main.js",
   "devDependencies": {
-    "gulp": "^3.8.11"
+    "chalk": "^1.0.0",
+    "event-stream": "^3.3.1",
+    "fs-extra": "^0.19.0",
+    "fs-promise": "^0.3.1",
+    "gulp": "^3.9.0",
+    "jpm": "^1.0.0",
+    "merge-stream": "^0.1.7",
+    "run-sequence": "^1.1.0",
+    "when": "^3.7.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/camolin3/directZ"
+    "url": "https://github.com/camolin3/directUC-next"
   },
   "keywords": [
     "PUC",
@@ -25,7 +31,7 @@
   "author": "camolin3",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/camolin3/directZ/issues"
+    "url": "https://github.com/camolin3/directUC-next/issues"
   },
-  "homepage": "https://github.com/camolin3/directZ"
+  "homepage": "https://github.com/camolin3/directUC-next"
 }
