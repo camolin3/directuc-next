@@ -5,13 +5,12 @@
   "main": "main.js",
   "devDependencies": {
     "chalk": "^1.0.0",
+    "chrome-tailor": "git://github.com/camolin3/chrome-tailor",
     "event-stream": "^3.3.1",
     "fs-extra": "^0.19.0",
     "fs-promise": "^0.3.1",
     "gulp": "^3.9.0",
-    "jpm": "^1.0.0",
     "merge-stream": "^0.1.7",
-    "run-sequence": "^1.1.0",
     "when": "^3.7.3"
   },
   "scripts": {

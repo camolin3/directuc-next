@@ -4,12 +4,9 @@ var gulp = require('gulp'),
   path = require('path'),
   fs = require('fs-promise'),
   merge = require('merge-stream'),
-  runSequence = require('run-sequence').use(gulp),
   es = require('event-stream'),
   chalk = require('chalk'),
-  Promise = require('when'),
-  utils = require('jpm/lib/utils'),
-  xpi = require('jpm/lib/xpi');
+  Promise = require('when');
 
 // Console-like API for printing with colors
 var c = {
@@ -28,54 +25,59 @@ var CONG = {
   bin: 'bin/'
 };
 
-gulp.task('default', function() {
-  runSequence('copy');
-});
+gulp.task('build', ['build:chrome', 'build:firefox']);
+gulp.task('build:chrome', ['copy'], taskBuildChrome);
+gulp.task('build:firefox', ['copy'], taskBuildFirefox);
+gulp.task('clean', taskClean);
+gulp.task('copy', ['copy:commons', 'copy:platform-specific']);
+gulp.task('copy:commons', ['clean'], taskCopyCommons);
+gulp.task('copy:platform-specific', ['copy:commons'], taskCopyPlatfomSpecific);
+gulp.task('default', ['clean', 'copy', 'build']);
 
-gulp.task('clean', function() {
-  c.log('>>>>>>>>>> Cleaning >>>>>>>>>>');
+function taskClean() {
+  c.log('Cleaning final source code and binaries');
 
   var directories = [CONG.dest, CONG.bin];
+
   return Promise.all(directories.map(function(d) {
     return fs.emptyDir(d);
   }))
     .catch(c.error);
-});
+}
 
-gulp.task('build:chrome', function() {
-  c.log('>>>>>>>>>> Building Chrome... >>>>>>>>>>');
+function taskBuildChrome() {
+  c.log('Building Chrome...');
   // TODO: complete this
-});
+}
 
-gulp.task('build:firefox', function() {
-  c.log('>>>>>>>>>> Building Firefox... >>>>>>>>>>');
+function taskBuildFirefox() {
+  c.log('Building Firefox...');
 
-  var originalPath = process.cwd(),
-    // load the manifest and set options
-    manifest = require(path.join(originalPath, CONG.dest, 'firefox/package.json')),
-    options = {
-      xpiPath: path.join(originalPath, CONG.bin)
-    };
-  
-  // change to destination directory
-  process.chdir(CONG.dest + 'firefox');
+  var converterPath = path.join(__dirname, 'node_modules', 'chrome-tailor'),
+    codePath = path.join(__dirname, CONG.dest, 'firefox'),
+    destPath = path.join(__dirname, CONG.bin);
 
-  // build the .xpi
-  return xpi(manifest, options)
-    .then(function (xpiPath) {
-    c.log('>>>>>>>>>> Successfully created xpi at ' + xpiPath);
-  }).catch(c.error).then(function() {
-    // go back to the root of the project
-    process.chdir(originalPath);
+  // convert the chrome manifest, using as a basis `package.json` (if exists)
+  var convertManifest = require(path.join(converterPath, 'lib', 'package')).convertManifest;
+  var packagePath = path.join(codePath, 'package.json');
+  if (!fs.existsSync(packagePath)) {
+    packagePath = null;
+  }
+
+  var makeXPI = require(path.join(converterPath, 'lib', 'xpi')).xpi;
+
+  return makeXPI({
+    cwd: codePath,
+    basePackage: packagePath
+  }).then(function(xpiPath) {
+    gulp.src(xpiPath)
+      .pipe(gulp.dest(destPath))
+      .on('error', c.error);
   });
-});
+}
 
-gulp.task('copy', function() {
-  return runSequence('clean', 'copy:commons', 'copy:platform-specific');
-});
-
-gulp.task('copy:commons', function() {
-  c.log('>>>>>>>>>> Copying commons source files >>>>>>>>>>');
+function taskCopyCommons() {
+  c.log('Copying commons source files');
 
   var commons = gulp.src(CONG.src.commons + '**/*.*');
 
@@ -84,10 +86,10 @@ gulp.task('copy:commons', function() {
   });
 
   return commons;
-});
+}
 
-gulp.task('copy:platform-specific', function() {
-  c.log('>>>>>>>>>> Copying platform-specific files >>>>>>>>>>');
+function taskCopyPlatfomSpecific() {
+  c.log('Copying platform-specific files');
 
   var commonsStreams = CONG.platforms.map(function(platform) {
     // explore the files for each platform
@@ -108,8 +110,9 @@ gulp.task('copy:platform-specific', function() {
           }
         });
       }))
-      .pipe(gulp.dest(CONG.dest)).on('error', c.error);
+      .pipe(gulp.dest(CONG.dest))
+      .on('error', c.error);
   });
 
   return merge.apply(merge, commonsStreams);
-});
+}
